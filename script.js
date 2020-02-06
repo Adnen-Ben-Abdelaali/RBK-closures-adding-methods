@@ -81,40 +81,112 @@ function counter(initialCount) {
 }
 /******************************************/
 /*
-1. Remember the guessing game from the first week? 
-When we wrote the first version of the game, we didn't know about
-closures and stored all of our state (variables) in the global scope. 
-Rewrite the guessing game to take advantage of closures so that you 
-can create multiple games. Here is some starter code:
+Advanced
 
-function randInt(n) {
-     return Math.floor(Math.random() * (n + 1));
-     }
-     var upperBound = 5;
-      function guessMyNumber(n) {
-     if (n > upperBound) {
-          return 'Out of bounds! Please try a number between 0 and ' + upperBound + '.';
-     } else if (n === randInt(upperBound)) {
-          return 'You guessed my number!';
-          }
-     return 'Nope! That was nnt it!';
-     }
-     }
+1. Most banks keep records of the transactions that take place in 
+an account. Implement a transaction log that keeps track of all 
+transactions that occur in a given account. 
+A single transaction should probably be represented by an object, 
+for instance:
 
-2. You will need to define a function makeGame, and at the minimum, 
-you should be able to play the game like this
-
- var game = makeGame(10); // 10 is the upper bound
-game(2); // => 'Nope! That was not it!'
-game(7); // => 'Nope! That was not it!'
-game(5); // => 'You guessed my number!'
-Ways to improve the game include:
-A way to 'give up' and have the game reset, e.g. game.giveUp().
-Keep track of how many guesses have been made, and provide a way to access them, e.g. game.numGuesses().
-See the original exercise for the rest of the improvements!
+ {type: 'deposit', amount: 100, before: 110, after: 210, status: 'approved'}
+{type: 'withdrawal', amount: 5000, before: 210, after: 210, status: 'denied'}
+Modify the return value of your makeAccount function to include the capability to view the last n transactions with a function called transactionHistory:
+var account = makeAccount(100);
+// ...
+account.transactionHistory(2); // => [{...}, {...}]
+Other ideas to try include:
+Implement a way to get the last n withdrawals or deposits
+Implement a function that determines the average withdrawal and 
+deposit amounts.
+Learn about the JavaScript Date object (try typing new Date() into a console) and incorporate time into the transactions.
 */
+function makeAccountAdvanced(initialDeposit) {
+  let deposit = initialDeposit;
+  let transactionsRecordArray = new Array();
+  let currentTransaction = {
+    type: "transactionType",
+    amount: 0,
+    before: initialDeposit,
+    after: initialDeposit,
+    status: 'approvedOrDenied'
+  };
+  
+  return {
+    deposit: function(depositAmount) {
+      currentTransaction["before"] = deposit;
+      deposit += depositAmount;
+      currentTransaction["type"] = "deposit";
+      currentTransaction["amount"] = depositAmount;
+      currentTransaction["after"] = deposit;
+      currentTransaction["status"] = "approved";
+      transactionsRecordArray.push(currentTransaction);
+      return `Your actual balance is :  ${deposit}`;
+    },
+    withdraw: function(withdrawAmount) {
+      currentTransaction["before"] = deposit;
+      currentTransaction["amount"] = withdrawAmount;
+      if(withdrawAmount <= deposit) {
+        deposit -= withdrawAmount;
+        currentTransaction["after"] = deposit;
+        currentTransaction["status"] = "approved";
+        transactionsRecordArray.push(currentTransaction);
+        return `Here's your money : ${withdrawAmount}`;
+      }else {
+        currentTransaction["after"] = deposit;
+        currentTransaction["status"] = "denied";
+        transactionsRecordArray.push(currentTransaction);
+        return `You have insufficient funds. You can't withdraw ${withdrawAmount}, once you have only ${deposit}`;
+      }
+    },
+    checkBalance: function() {
 
+      return `Your balance is: $${deposit}`;
+    },
+    transactionHistory: function(numberOfTransactionsToView) {
+      let lastTransactions = new Array();
 
+      for(let i = transactionsRecordArray.length; i >=transactionsRecordArray.length - numberOfTransactionsToView; i--) {
+        lastTransactions.push(transactionsRecordArray[i]);
+      }
+      return lastTransactions;
+    }
+  }
+}
+/*****************************************************************************************************************************/
+/*
+1. Write function evaluate(left, op, right) that given two operands (left and right) 
+and an operator (op), will evaluate and return the result. For example:
+
+ var left = {
+     'multiply': {
+     'add': [1, 2, 3, 4, 5],
+     'subtract': [5, 6, 7, 8, 9],
+     'multiply': [1, 2, 3, 4, 5],
+     'divide': [1, 2, 3, 4, 5]
+     }
+};
+ You will reduce each array based on its key. So you will start of with 
+ add(ing) [1,2,3,4,5] => 15then subtract(ing) [5, 6, 7, 8, 9] => -25 etc. 
+ Once all arrays have been reduced, you will perform theroot key operation on 
+ all the reduced arrays. So in this case, you will multiply each reduced array 
+ with each other. The order is ALWAYS value of 'add' key first, then 'subtract', 
+ then 'multiply' and finally 'divide'.
+ var right = {
+     'subtract': {
+     'add': [1, 2, 3, 4, 5],
+     'subtract': [1, 2, 3, 4, 5],
+     'multiply': [1, 2, 3, 4, 5],
+     'divide': [1, 2, 3, 4, 5]
+     }
+};
+ evaluate(left, 'add', right); //===> -467.0083333333333 
+ function evaluate(left, op, right) {
+ }
+
+ Note you need to solve it without closures first then, use closures with mothods 
+ instead of the op parameter
+ */
 
 
 
